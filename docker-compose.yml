@@ -1,0 +1,40 @@
+version: '2'
+services:
+  app:
+    build: 
+        context: .
+        dockerfile: Dockerfile
+    ports:
+      - "1234:1234"
+    volumes:
+      - "./000-default.conf:/etc/apache2/sites-available/000-default.conf"
+      - "./index.php:/opt/data/index.php"
+    
+    
+  db:
+    image: mysql:5.7.13
+    ports:
+      - "3356:3356"
+    environment:
+      MYSQL_DATABASE: myDb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: test
+      MYSQL_ROOT_PASSWORD: test
+    volumes:
+      - "./dump:/docker-entrypoint-initdb.d"
+      - "persistent:/var/lib/mysql"
+    networks:
+      - default
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+      - db:db
+    ports:
+      - 8000:80
+    environment:
+      MYSQL_USER: user
+      MYSQL_PASSWORD: test
+      MYSQL_ROOT_PASSWORD: test
+volumes:
+      persistent:
+ 
